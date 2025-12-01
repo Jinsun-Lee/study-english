@@ -1,1 +1,4 @@
-# [디스커션에 기록해 ㄱㄱ](https://github.com/Jinsun-Lee/English-template/discussions/new?category=announcements)
+# 설명  
+영어 학습 내용을 기록하고 정리하기 위한 레포지토리입니다.  
+
+<br><br>  
