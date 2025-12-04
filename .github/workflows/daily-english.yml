@@ -1,0 +1,44 @@
+name: Daily English Question
+
+on:
+  schedule:
+    - cron: "0 23 * * *" # KST 08:00 (UTC 23:00)
+  workflow_dispatch: # 수동 실행도 가능
+
+jobs:
+  create-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate date
+        id: date
+        run: |
+          d=$(date +"%y%m%d")
+          echo "date=$d" >> $GITHUB_OUTPUT
+
+      - name: Create English question
+        id: question
+        run: |
+          questions=(
+            "What was the most interesting part of your day?"
+            "If you could change one habit, what would it be?"
+            "Describe a challenge you recently faced and how you dealt with it."
+            "What is one thing you want to improve this week?"
+            "If you could travel anywhere today, where would you go and why?"
+            "What is something new you learned recently?"
+          )
+          q=${questions[$RANDOM % ${#questions[@]}]}
+          echo "q=$q" >> $GITHUB_OUTPUT
+
+      - name: Create Issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const date = "${{ steps.date.outputs.date }}";
+            const question = "${{ steps.question.outputs.q }}";
+
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[${date}] Daily English Question`,
+              body: `## Today's English Question\n\n${question}`
+            });
