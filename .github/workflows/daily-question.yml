@@ -1,0 +1,150 @@
+name: Daily English Question
+
+on:
+  schedule:
+    - cron: "0 23 * * *" # KST 08:00 (UTC 23:00)
+  workflow_dispatch: # 수동 실행도 가능
+
+permissions:
+  issues: write
+
+jobs:
+  generate-question:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate date
+        id: date
+        run: |
+          d=$(date +"%y%m%d")
+          echo "date=$d" >> $GITHUB_OUTPUT
+
+      - name: Generate English question (premium natural version)
+        id: question
+        run: |
+          # ====== Topic Pool (Jinsun OPIc Survey 기반) ======
+          topics=(
+            "jogging" 
+            "walking"
+            "cooking" 
+            "swimming" 
+            "cycling" 
+            "gym workout" 
+            "soccer"
+            "skiing/snowboarding"
+            "home routine"
+            "study"
+            "vacation at home"
+            "domestic business trip"
+            "overseas business trip"
+            "watching sports"
+            "home improvement"
+            "not exercising"
+            # 돌발 상황 OPIc 기본 포함
+            "dentist" 
+            "hair salon" 
+            "traffic" 
+            "shopping"
+            "reservation problem"
+            "lost direction"
+          )
+
+          # ====== Expanded topic forms ======
+          expand_topic() {
+            case "$1" in
+              "jogging") echo "jogging outdoors";;
+              "walking") echo "taking a long walk outside";;
+              "cooking") echo "cooking at home";;
+              "swimming") echo "swimming at the pool";;
+              "cycling") echo "going for a bike ride";;
+              "gym workout") echo "working out at the gym";;
+              "soccer") echo "playing soccer with others";;
+              "skiing/snowboarding") echo "skiing or snowboarding at a resort";;
+              "home routine") echo "your daily routine at home";;
+              "study") echo "studying for your classes";;
+              "vacation at home") echo "spending your vacation at home";;
+              "domestic business trip") echo "traveling for a domestic business trip";;
+              "overseas business trip") echo "traveling abroad for a business trip";;
+              "watching sports") echo "watching sports games or matches";;
+              "home improvement") echo "doing home improvement or DIY projects";;
+              "not exercising") echo "not exercising and spending time on other things";;
+              "dentist") echo "visiting the dentist";;
+              "hair salon") echo "going to the hair salon";;
+              "traffic") echo "dealing with heavy traffic";;
+              "shopping") echo "shopping for everyday items";;
+              "reservation problem") echo "dealing with a reservation problem";;
+              "lost direction") echo "getting lost and finding the way";;
+            esac
+          }
+
+          # ====== Verb/Noun forms ======
+          verb_topic() {
+            case "$1" in
+              "jogging") echo "go jogging";;
+              "walking") echo "go for a walk";;
+              "cooking") echo "cook meals";;
+              "swimming") echo "go swimming";;
+              "cycling") echo "go cycling";;
+              "gym workout") echo "work out";;
+              "soccer") echo "play soccer";;
+              "skiing/snowboarding") echo "go skiing or snowboarding";;
+              "home routine") echo "follow your daily routine";;
+              "study") echo "study regularly";;
+              "vacation at home") echo "spend your vacation at home";;
+              "domestic business trip") echo "travel for business";;
+              "overseas business trip") echo "travel abroad for business";;
+              "watching sports") echo "watch sports";;
+              "home improvement") echo "work on home improvement projects";;
+              "not exercising") echo "avoid exercising and do other activities";;
+              "dentist") echo "visit the dentist";;
+              "hair salon") echo "go to the hair salon";;
+              "traffic") echo "deal with heavy traffic";;
+              "shopping") echo "go shopping";;
+              "reservation problem") echo "handle a reservation issue";;
+              "lost direction") echo "find your way when you're lost";;
+            esac
+          }
+
+          # ====== Question Patterns ======
+          patterns=(
+            "Describe a memorable experience related to TOPIC_EXPANDED."
+            "What is the most challenging part of TOPIC_EXPANDED, and how do you usually handle it?"
+            "Explain a problem you experienced while you tried to VERB_TOPIC."
+            "How often do you VERB_TOPIC, and what motivates you to keep doing it?"
+            "Tell me about a time when something unexpected happened during TOPIC_EXPANDED."
+            "Why do you prefer to VERB_TOPIC rather than doing other activities?"
+            "What advice would you give to someone who wants to START_TOPIC?"
+            "Compare your past and present experience with TOPIC_EXPANDED."
+            "Describe a situation where TOPIC_EXPANDED became more difficult than expected."
+            "What is your favorite thing about TOPIC_EXPANDED, and why?"
+          )
+
+          # ====== Random Selection ======
+          topic=${topics[$RANDOM % ${#topics[@]}]}
+          expanded=$(expand_topic "$topic")
+          verb=$(verb_topic "$topic")
+          start_form=$(echo "$verb" | sed 's/ .*//')
+
+          pattern=${patterns[$RANDOM % ${#patterns[@]}]}
+
+          # ====== Replace placeholders ======
+          question=$(echo "$pattern" \
+            | sed "s/TOPIC_EXPANDED/$expanded/g" \
+            | sed "s/VERB_TOPIC/$verb/g" \
+            | sed "s/START_TOPIC/$verb/g")
+
+          echo "q=$question" >> $GITHUB_OUTPUT
+
+      - name: Create Issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const date = "${{ steps.date.outputs.date }}";
+            const question = "${{ steps.question.outputs.q }}";
+
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[${date}] Daily English Question`,
+              body: `## Today's English Question\n\n${question}`
+            });
