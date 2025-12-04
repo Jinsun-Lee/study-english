@@ -1,0 +1,28 @@
+name: Auto Issue Title
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  set-title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update issue title
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const d = new Date();
+            const yy = String(d.getFullYear()).slice(2);
+            const mm = String(d.getMonth()+1).padStart(2,'0');
+            const dd = String(d.getDate()).padStart(2,'0');
+            const prefix = `[${yy}${mm}${dd}]`;
+
+            const oldTitle = context.payload.issue.title;
+            const newTitle = `${prefix} ${oldTitle}`;
+
+            github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              title: newTitle
+            });
