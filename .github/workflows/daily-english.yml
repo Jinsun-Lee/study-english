@@ -5,9 +5,13 @@ on:
     - cron: "0 23 * * *" # KST 08:00 (UTC 23:00)
   workflow_dispatch: # 수동 실행도 가능
 
+permissions:
+  issues: write
+
 jobs:
-  create-issue:
+  generate-question:
     runs-on: ubuntu-latest
+
     steps:
       - name: Generate date
         id: date
@@ -15,19 +19,82 @@ jobs:
           d=$(date +"%y%m%d")
           echo "date=$d" >> $GITHUB_OUTPUT
 
-      - name: Create English question
+      - name: Generate English question (premium natural version)
         id: question
         run: |
-          questions=(
-            "What was the most interesting part of your day?"
-            "If you could change one habit, what would it be?"
-            "Describe a challenge you recently faced and how you dealt with it."
-            "What is one thing you want to improve this week?"
-            "If you could travel anywhere today, where would you go and why?"
-            "What is something new you learned recently?"
+          # ====== Topic Pool ======
+          topics=("jogging" "cooking" "swimming" "cycling" "gym workout" 
+                  "dentist" "hair salon" "traffic" "shopping" 
+                  "home routine" "study" "domestic business trip" 
+                  "vacation at home")
+
+          # ====== Expanded topic forms ======
+          expand_topic() {
+            case "$1" in
+              "jogging") echo "jogging outdoors";;
+              "cooking") echo "cooking at home";;
+              "swimming") echo "swimming at the pool";;
+              "cycling") echo "going for a bike ride";;
+              "gym workout") echo "working out at the gym";;
+              "dentist") echo "visiting the dentist";;
+              "hair salon") echo "going to the hair salon";;
+              "traffic") echo "dealing with traffic";;
+              "shopping") echo "shopping for everyday items";;
+              "home routine") echo "your daily routine at home";;
+              "study") echo "studying for classes or exams";;
+              "domestic business trip") echo "traveling for a domestic business trip";;
+              "vacation at home") echo "spending your vacation at home";;
+            esac
+          }
+
+          # ====== Verb/Noun forms ======
+          verb_topic() {
+            case "$1" in
+              "jogging") echo "go jogging";;
+              "cooking") echo "cook meals";;
+              "swimming") echo "go swimming";;
+              "cycling") echo "go cycling";;
+              "gym workout") echo "work out";;
+              "dentist") echo "visit the dentist";;
+              "hair salon") echo "go to the hair salon";;
+              "traffic") echo "deal with heavy traffic";;
+              "shopping") echo "go shopping";;
+              "home routine") echo "follow your daily routine";;
+              "study") echo "study regularly";;
+              "domestic business trip") echo "travel for business";;
+              "vacation at home") echo "spend your vacation at home";;
+            esac
+          }
+
+          # ====== Question Patterns ======
+          patterns=(
+            "Describe a memorable experience related to TOPIC_EXPANDED."
+            "What is the most challenging part of TOPIC_EXPANDED, and how do you usually handle it?"
+            "Explain a problem you experienced while TOPIC_EXPANDED."
+            "How often do you VERB_TOPIC, and what motivates you to continue?"
+            "Tell me about a time when an unexpected situation happened during TOPIC_EXPANDED."
+            "Why do you prefer to VERB_TOPIC rather than other activities?"
+            "What advice would you give to someone who wants to START_TOPIC?"
+            "Compare your past and present experience with TOPIC_EXPANDED."
+            "What is your favorite thing about TOPIC_EXPANDED, and why?"
+            "Describe a situation where TOPIC_EXPANDED became more difficult than expected."
           )
-          q=${questions[$RANDOM % ${#questions[@]}]}
-          echo "q=$q" >> $GITHUB_OUTPUT
+
+          # ====== Random Selection ======
+          topic=${topics[$RANDOM % ${#topics[@]}]}
+          expanded=$(expand_topic "$topic")
+          verb=$(verb_topic "$topic")
+          start_form=$(echo "$verb" | sed 's/ .*//') # simple verb stem
+
+          pattern=${patterns[$RANDOM % ${#patterns[@]}]}
+
+          # ====== Replace placeholders ======
+          question=$(echo "$pattern" \
+            | sed "s/TOPIC_EXPANDED/$expanded/g" \
+            | sed "s/VERB_TOPIC/$verb/g" \
+            | sed "s/START_TOPIC/$verb/g")
+
+          echo "q=$question" >> $GITHUB_OUTPUT
 
       - name: Create Issue
         uses: actions/github-script@v6
