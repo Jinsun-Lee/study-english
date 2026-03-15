@@ -1,11 +1,9 @@
 # 설명  
-[![Daily English Question](https://github.com/Jinsun-Lee/english-study/actions/workflows/daily-question.yml/badge.svg)](https://github.com/Jinsun-Lee/english-study/actions/workflows/daily-question.yml)    
 영어 학습 내용을 기록하고 정리하기 위한 레포지토리입니다.  
 
 <br><br>  
 
-### 레포 구조
-[OpenAI API 사용량](https://platform.openai.com/settings/organization/usage)을 확인하기 위한 링크입니다.
+### 구조
 ```
 english-study/
  ├─ .github/
@@ -24,7 +22,3 @@ english-study/
  │
  └─ README.md                        # 레포 전체 설명, 작동 방식, 셋업 안내
 ```
-
-<br>  
-
-### 
