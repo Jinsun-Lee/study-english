@@ -1,4 +1,4 @@
-name: Daily English Question
+name: Daily GPT Question
 
 on:
   schedule:
