@@ -18,6 +18,7 @@
 - `workflow_answers.md`: 답변 파일 이름 규칙(`yyyy_mm_dd_내용.md`)과 영어 코치 페르소나·피드백 구조·질문 생성 규칙
 - `workflow_expressions.md`: 사용자가 복습할 표현을 알려주면 `.github/expressions/`에 파일 생성하고 `README.md`에 추가하는 워크플로우
 - `workflow_trends.md`: 사용자가 출제 경향을 알려주면 `.github/trends/`에 날짜 파일 생성, 문제 출제 시 최신 경향 파일 하나만 참조하는 워크플로우
+- `workflow_reading.md`: 사용자가 영어 글을 읽고 싶어 하면 번역 대신 읽기 코치로 동작하는 워크플로우(능동 읽기 루프·연구 근거 기반 학습법)
 
 <br>
 
