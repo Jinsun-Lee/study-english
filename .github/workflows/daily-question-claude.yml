@@ -141,10 +141,28 @@ jobs:
           script: |
             const date = "${{ steps.date.outputs.date }}";
             const question = "${{ steps.question.outputs.q }}";
+            const title = `[${date}] Daily English Question`;
 
-            github.rest.issues.create({
+            // 아직 열려 있는 Daily 이슈가 있으면 새로 발행하지 않음
+            const existing = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `[${date}] Daily English Question`,
-              body: `## Today's English Question\n\n${question}`
+              state: "open",
+              per_page: 100,
+            });
+            const openDaily = existing.data.find(
+              (i) => !i.pull_request && i.title.includes("Daily English Question")
+            );
+            if (openDaily) {
+              console.log(`아직 열려 있는 Daily 이슈가 있어 건너뜁니다: #${openDaily.number}`);
+              return;
+            }
+
+            // 하루 1개 이슈를 생성하고 담당자로 할당
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: `## Today's English Question\n\n${question}`,
+              assignees: ["Jinsun-Lee"],
             });
