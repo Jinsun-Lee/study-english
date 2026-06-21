@@ -143,16 +143,18 @@ jobs:
             const question = "${{ steps.question.outputs.q }}";
             const title = `[${date}] Daily English Question`;
 
-            // 오늘 같은 제목의 이슈가 이미 있으면 중복 발행하지 않음
+            // 아직 열려 있는 Daily 이슈가 있으면 새로 발행하지 않음
             const existing = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              state: "all",
+              state: "open",
               per_page: 100,
             });
-            const already = existing.data.find((i) => i.title === title);
-            if (already) {
-              console.log(`이미 발행된 이슈가 있어 건너뜁니다: #${already.number}`);
+            const openDaily = existing.data.find(
+              (i) => !i.pull_request && i.title.includes("Daily English Question")
+            );
+            if (openDaily) {
+              console.log(`아직 열려 있는 Daily 이슈가 있어 건너뜁니다: #${openDaily.number}`);
               return;
             }
 
