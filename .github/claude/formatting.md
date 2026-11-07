@@ -7,7 +7,7 @@ description: 커밋 메시지·md 파일 포맷팅 규칙과 학습 파일 생�
 - `[태그] 한국어 설명` 형식을 사용한다.
 - 태그: `docs`(문서 추가/수정), `chore`(파일 이동/삭제/정리), `feat`(기능 추가), `fix`(버그 수정)
 - 설명은 한 줄로 간결하게 작성한다.
-- Co-Authored-By 라인이나 불필요한 부연 설명을 넣지 않는다.
+- Co-Authored-By 라인이나 불필요한 부연 설명을 넣지 않는다. 커밋 명의는 `Claude <noreply@anthropic.com>` 로 남는다.
 - 커밋을 수정(amend/rebase)할 때 원래 커밋의 시간(author date)을 유지한다.
 
 <br>

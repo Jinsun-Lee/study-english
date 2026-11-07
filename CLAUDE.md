@@ -28,5 +28,5 @@ description: Claude가 참고하는 프로젝트 전체 지침
 - 새 작업을 시작하기 전에 해당 워크플로우 파일을 반드시 읽는다.
 - 파일 생성·수정 시 `formatting.md`의 포맷팅 규칙을 따른다.
 - 사용자 배경 정보는 `workflow_questions.md`에서만 관리하고, 다른 파일은 그 내용과 일치시킨다.
-- Co-Authored-By 라인을 커밋 메시지에 넣지 않는다.
+- 커밋 명의는 `Claude <noreply@anthropic.com>` 로 남긴다(`.claude/settings.json` env 가 강제). Co-Authored-By 라인은 커밋 메시지에 따로 넣지 않는다.
 - 날짜 구분자는 하이픈(`-`)이 아니라 언더스코어(`_`)를 사용한다.
